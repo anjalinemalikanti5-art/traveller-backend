@@ -3,27 +3,22 @@ package com.example.smart_travel;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "bus")
 public class Bus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
     private String busNumber;
-
-    @Column(nullable = false)
     private String source;
-
-    @Column(nullable = false)
     private String destination;
-
     private int totalSeats;
+    private int price;
 
-    public Bus() {}
+    // Getters and Setters
 
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
     public String getBusNumber() { return busNumber; }
     public void setBusNumber(String busNumber) { this.busNumber = busNumber; }
@@ -36,4 +31,7 @@ public class Bus {
 
     public int getTotalSeats() { return totalSeats; }
     public void setTotalSeats(int totalSeats) { this.totalSeats = totalSeats; }
+
+    public int getPrice() { return price; }
+    public void setPrice(int price) { this.price = price; }
 }

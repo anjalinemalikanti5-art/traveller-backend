@@ -1,44 +1,38 @@
 package com.example.smart_travel;
 
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/bookings")
+@CrossOrigin("*")
 public class BookingController {
 
-    private final BookingRepository bookingRepo;
+    private final BookingRepository repo;
 
-    public BookingController(BookingRepository bookingRepo) {
-        this.bookingRepo = bookingRepo;
+    public BookingController(BookingRepository repo) {
+        this.repo = repo;
     }
 
+    // GET all bookings
     @GetMapping
-    public List<Booking> getAllBookings() {
-        return bookingRepo.findAll();
+    public List<Booking> getAll() {
+        return repo.findAll();
     }
 
+    // POST book seat
     @PostMapping
-    public Booking bookSeat(@RequestBody Booking booking) {
-
-        boolean alreadyBooked = bookingRepo
-                .findByBusNumberAndStatus(booking.getBusNumber(), "BOOKED")
-                .stream()
-                .anyMatch(b -> b.getSeatNumber() == booking.getSeatNumber());
-
-        if (alreadyBooked) {
-            throw new RuntimeException("Seat already booked!");
-        }
-
-        booking.setStatus("BOOKED");
-        return bookingRepo.save(booking);
+    public Booking book(@RequestBody Booking booking) {
+        booking.setStatus("BOOKED"); // 🔥 important
+        return repo.save(booking);
     }
 
+    // CANCEL booking
     @PutMapping("/cancel/{id}")
-    public Booking cancelBooking(@PathVariable Long id) {
-        Booking booking = bookingRepo.findById(id).orElseThrow();
-        booking.setStatus("CANCELLED");
-        return bookingRepo.save(booking);
+    public Booking cancel(@PathVariable Long id) {
+        Booking b = repo.findById(id).orElseThrow();
+        b.setStatus("CANCELLED");
+        return repo.save(b);
     }
 }

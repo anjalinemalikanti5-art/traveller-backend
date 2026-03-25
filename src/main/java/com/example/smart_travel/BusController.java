@@ -4,44 +4,34 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/buses")
+@CrossOrigin("*")
 public class BusController {
 
-    private final BusRepository busRepo;
-    private final BookingRepository bookingRepo;
+    private final BusRepository busRepository;
 
-    public BusController(BusRepository busRepo, BookingRepository bookingRepo) {
-        this.busRepo = busRepo;
-        this.bookingRepo = bookingRepo;
+    public BusController(BusRepository busRepository) {
+        this.busRepository = busRepository;
     }
 
+    // GET all buses
     @GetMapping
     public List<Bus> getAllBuses() {
-        return busRepo.findAll();
+        return busRepository.findAll();
     }
 
+    // POST add bus
     @PostMapping
     public Bus addBus(@RequestBody Bus bus) {
-        bus.setTotalSeats(20);
-        return busRepo.save(bus);
+        return busRepository.save(bus);
     }
 
+    // 🔥 SEARCH API
     @GetMapping("/search")
-    public List<Bus> searchBus(@RequestParam String source,
-                              @RequestParam String destination) {
-        return busRepo.findBySourceIgnoreCaseAndDestinationIgnoreCase(source, destination);
-    }
+    public List<Bus> searchBus(
+            @RequestParam String source,
+            @RequestParam String destination) {
 
-    @GetMapping("/availableSeats/{busNumber}")
-    public int availableSeats(@PathVariable String busNumber) {
-
-        Bus bus = busRepo.findByBusNumber(busNumber)
-                .orElseThrow(() -> new RuntimeException("Bus not found"));
-
-        List<Booking> bookings = bookingRepo
-                .findByBusNumberAndStatus(busNumber, "BOOKED");
-
-        return bus.getTotalSeats() - bookings.size();
+        return busRepository.findBySourceAndDestination(source, destination);
     }
 }
